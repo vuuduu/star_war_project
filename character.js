@@ -19,6 +19,17 @@ addEventListener('DOMContentLoaded', () => {
   getCharacter(id)
 });
 
+async function fetchFilm(id) {
+  let filmUrl = `${baseUrl}/films/${id}`;
+  const filmResponse = await fetch(filmUrl).then(res => res.json())
+  .then(responseJson => {
+    localStorage.setItem(`film${responseJson.id}`, JSON.stringify(responseJson));
+    return responseJson;
+  });
+
+  return filmResponse;
+}
+
 async function getCharacter(id) {
   // Try grabbing current character from browser cache
   var character = localStorage.getItem(`character${id}`);
@@ -46,17 +57,34 @@ async function fetchCharacter(id) {
 }
 
 async function fetchHomeworld(character) {
-  const url = `${baseUrl}/planets/${character?.homeworld}`;
-  const planet = await fetch(url)
-    .then(res => res.json())
-  return planet;
+  const homeworldId = character?.homeworld;
+  var planet = localStorage.getItem(`planet${homeworldId}`);
+
+  if (!planet) {
+    const url = `${baseUrl}/planets/${homeworldId}`;
+    const planet = await fetch(url)
+      .then(res => res.json());
+    localStorage.setItem(`planet${homeworldId}`, JSON.stringify(planet));
+  }
+  
+  return `planet${homeworldId}`;
 }
 
 async function fetchFilms(character) {
   const url = `${baseUrl}/characters/${character?.id}/films`;
+  var filmKeyList = [];
   const films = await fetch(url)
     .then(res => res.json())
-  return films;
+    .then(filmList => filmList.forEach(film => {
+      var currFilm = localStorage.getItem(`film${film.id}`);
+
+      if (!currFilm) {
+        fetchFilm(film.id);
+      }
+
+      filmKeyList.push(`film${film.id}`);
+    }))
+  return filmKeyList;
 }
 
 const renderCharacter = character => {
@@ -65,7 +93,13 @@ const renderCharacter = character => {
   heightSpan.textContent = character?.height;
   massSpan.textContent = character?.mass;
   birthYearSpan.textContent = character?.birth_year;
-  homeworldSpan.innerHTML = `<a href="/planet.html?id=${character?.homeworld.id}">${character?.homeworld.name}</a>`;
-  const filmsLis = character?.films?.map(film => `<li><a href="/film.html?id=${film.id}">${film.title}</li>`)
-  filmsUl.innerHTML = filmsLis.join("");
+  // Grabs homeworldObject from local storage
+  const homeworldObject = JSON.parse(localStorage.getItem(character?.homeworld));
+  homeworldSpan.innerHTML = `<a href="/planet.html?id=${homeworldObject.id}">${homeworldObject.name}</a>`;
+  const filmsList = character?.films?.map(filmKey => {
+    const filmObject = JSON.parse(localStorage.getItem(filmKey));
+    console.log(filmObject);
+    return `<li><a href="/film.html?id=${filmObject.id}">${filmObject.title}</li>`;
+  })
+  filmsUl.innerHTML = filmsList.join("");
 }
