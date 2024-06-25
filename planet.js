@@ -3,16 +3,16 @@ let terrainSpan;
 let climateSpan;
 let populationSpan;
 let planetNameH1;
-let filmsSection;
-let charactersSection;
+let filmsUL;
+let characterUL;
 
 addEventListener("DOMContentLoaded", () => {
     terrainSpan = document.querySelector("span#terrain");
     climateSpan = document.querySelector("span#climate");
     populationSpan = document.querySelector("span#population");
     planetNameH1 = document.querySelector("h1#name");
-    charactersSection = document.querySelector("section#characters");
-    filmsSection = document.querySelector("section#films");
+    characterUL = document.querySelector("#characters>ul");
+    filmsUL = document.querySelector("#films>ul");
 
     const sp = new URLSearchParams(window.location.search);
     const id = sp.get('id');
@@ -62,8 +62,8 @@ const renderPlanet = planetObj => {
     populationSpan.textContent = planetObj?.population;
 
     const characterList = planetObj?.characters?.map(char => `<li><a href="/character.html?id=${char.id}">${char.name}</li>`)
-    charactersSection.innerHTML = characterList.join("");
+    characterUL.innerHTML = characterList.join("");
 
     const filmsList = planetObj?.films?.map(film => `<li><a href="/film.html?id=${film.id}">${film.title}</li>`)
-    filmsSection.innerHTML = filmsList.join("");
+    filmsUL.innerHTML = filmsList.join("");
 }
