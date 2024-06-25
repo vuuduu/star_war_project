@@ -20,17 +20,24 @@ addEventListener('DOMContentLoaded', () => {
 });
 
 async function getCharacter(id) {
-  let character;
-  try {
-    character = await fetchCharacter(id)
-    character.homeworld = await fetchHomeworld(character)
-    character.films = await fetchFilms(character)
-  }
-  catch (ex) {
-    console.error(`Error reading character ${id} data.`, ex.message);
+  // Try grabbing current character from browser cache
+  var character = localStorage.getItem(`character${id}`);
+
+  if (!character) {
+    try {
+      character = await fetchCharacter(id)
+      character.homeworld = await fetchHomeworld(character)
+      character.films = await fetchFilms(character)
+    }
+    catch (ex) {
+      console.error(`Error reading character ${id} data.`, ex.message);
+    }
+    localStorage.setItem(`character${id}`, character);
   }
   renderCharacter(character);
-
+  
+  // Asynchronously preload content for all the links on the page
+  
 }
 async function fetchCharacter(id) {
   let characterUrl = `${baseUrl}/characters/${id}`;
