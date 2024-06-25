@@ -61,7 +61,7 @@ const renderPlanet = planetObj => {
     climateSpan.textContent = planetObj?.climate;
     populationSpan.textContent = planetObj?.population;
 
-    const characterList = planetObj?.characters?.map(char => `<li><a href="/characters.html?id=${char.id}">${char.name}</li>`)
+    const characterList = planetObj?.characters?.map(char => `<li><a href="/character.html?id=${char.id}">${char.name}</li>`)
     charactersSection.innerHTML = characterList.join("");
 
     const filmsList = planetObj?.films?.map(film => `<li><a href="/film.html?id=${film.id}">${film.title}</li>`)
